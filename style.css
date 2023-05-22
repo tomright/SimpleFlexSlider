@@ -1,0 +1,30 @@
+.slider-container-outer {
+  overflow: hidden;
+  border: 1px solid blue;
+  margin-top: 50px;
+}
+
+.slider-container {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* CSS transition applied when translation of items happen */
+.slider-container-transition {
+  transition: transform 0.7s ease-in-out;
+}
+
+.slider-item {
+  width: 100%;
+  flex-shrink: 0;
+}
+.container {
+  width: 1116px;
+  margin: 0 auto;
+}
+.move-button {
+  margin-top: 10px;
+}
