@@ -1,10 +1,10 @@
-.slider-container-outer {
+.slider__container-outer {
   overflow: hidden;
   border: 1px solid blue;
   margin-top: 50px;
 }
 
-.slider-container {
+.slider__container {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
@@ -13,11 +13,11 @@
 }
 
 /* CSS transition applied when translation of items happen */
-.slider-container-transition {
+.slider__container-transition {
   transition: transform 0.7s ease-in-out;
 }
 
-.slider-item {
+.slider__item {
   width: 100%;
   flex-shrink: 0;
 }
@@ -25,6 +25,12 @@
   width: 1116px;
   margin: 0 auto;
 }
-.move-button {
+.slider__move-button {
   margin-top: 10px;
+}
+.slider__progress-dot {
+  margin-top: 10px;
+}
+.slider__dot {
+  margin-right: 5px;
 }
