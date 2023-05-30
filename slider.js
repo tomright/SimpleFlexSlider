@@ -1,15 +1,21 @@
 let all_containers = document.querySelectorAll(".slider");
 class Slider {
   current = 1; // начальный счетчик для элементов
-  target_element = undefined; // поле для хранения начальной точки слайдера
-  next_button_press = undefined; // необходимо для отслеживания на какую кнопку нажал пользователь
-  progressDot = undefined; // нода дом дерева с прогрессом просмотра
-  progressDot__item_focus = `<img class="slider__dot" src="/src/EllipseFocusBlue.svg" alt="" />`; // код для добавления точки с фокусом
-  progressDot__item = `<img class="slider__dot" src="/src/EllipseNofocusBlue.svg" alt="" />`; // код для добавления точки без фокусa
+  target_element; // поле для хранения начальной точки слайдера
+  next_button_press; // необходимо для отслеживания на какую кнопку нажал пользователь
+  progressDot; // нода дом дерева с прогрессом просмотра
+  progressDot__item_focus; // код для добавления точки с фокусом
+  progressDot__item; // код для добавления точки без фокусa
+  progressDot__item_array;
   constructor(target_element) {
     this.target_element = target_element; // заполняем начальный элемент слайдера
     this.num_items = this.target_element.querySelectorAll(".slider__item").length; //общее количество слайдов
     this.progressDot = this.target_element.querySelector(".slider__progress-dot"); // нода для добавления в неё точек прогресса
+    this.progressDot__item_focus = this.progressDot.firstElementChild;
+    this.progressDot__item = this.progressDot.lastElementChild;
+
+    this.progressDot.removeChild(this.progressDot__item_focus);
+    this.progressDot.removeChild(this.progressDot__item);
   }
   init_sliders() {
     // функция инициализации и запуска
@@ -18,11 +24,11 @@ class Slider {
     });
     for (let i = 0; i < this.num_items - 1; i++) {
       // по количеству слайдов, добавляем точки прогресса, которые находятся не в фокусе
-      this.progressDot.insertAdjacentHTML("afterBegin", this.progressDot__item);
+      this.progressDot.append(this.progressDot__item.cloneNode(true));
     }
     // поскольку в данной реализации слайды начинаются с первого элемента, то нужно добавить точку с фокусом на ней
-    this.progressDot.insertAdjacentHTML("afterBegin", this.progressDot__item_focus);
-    // запускаем добавление событий
+    this.progressDot.prepend(this.progressDot__item_focus.cloneNode(true));
+    //запускаем добавление событий
     this.addEvents();
   }
   addEvents() {
@@ -41,6 +47,8 @@ class Slider {
     });
   }
   changeOrder() {
+    //TODO доделать, чтобы не писать вручную пути для файлов, чтобы он сам выбирал
+    this.progressDot__item_array = this.target_element.getElementsByClassName("slider__dot");
     // функция которая пересчитывает order, для того чтобы слайды менялись
     if (this.next_button_press) {
       //логика для пересчета позиций флекс элемента. true - нажата клавиша следующего слайда, иначе предыдущего
@@ -54,15 +62,15 @@ class Slider {
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
 
-        this.progressDot.childNodes[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
       }
 
       for (let i = 1; i < this.current; i++) {
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order; // проставляем позиции от первого и до текущего
         order++;
-        this.progressDot.childNodes[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
       }
-      this.progressDot.childNodes[this.current - 1].src = "/src/EllipseFocusBlue.svg"; //ставим точку фокуса на текущий элемент
+      this.progressDot__item_array[this.current - 1].src = "/src/EllipseFocusBlue.svg"; //ставим точку фокуса на текущий элемент
     } else {
       if (this.current == 1) this.current = this.num_items; // условие для того чтобы с первого элемента перейти на четвертый
       else this.current--;
@@ -73,16 +81,16 @@ class Slider {
         // аналогично предыдущим проставлениям ставим позиции для флекс элементов
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
-        this.progressDot.childNodes[i - 1].src = "/src/EllipseNofocusBlue.svg";
+        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg";
       }
 
       for (let i = this.num_items; i > this.current; i--) {
         // аналогично предыдущим проставлениям ставим позиции для флекс элементов
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
-        this.progressDot.childNodes[i - 1].src = "/src/EllipseNofocusBlue.svg";
+        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg";
       }
-      this.progressDot.childNodes[this.current - 1].src = "/src/EllipseFocusBlue.svg";
+      this.progressDot__item_array[this.current - 1].src = "/src/EllipseFocusBlue.svg";
     }
     this.target_element.querySelector(".slider__container").style.transform = "translateX(0)"; // после пересчета показываем первый элемент флекс конейнера
     this.target_element.querySelector(".slider__container").classList.remove("slider__container-transition"); // убираем анимации чтоб все не прыгало
