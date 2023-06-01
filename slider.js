@@ -47,7 +47,6 @@ class Slider {
     });
   }
   changeOrder() {
-    //TODO доделать, чтобы не писать вручную пути для файлов, чтобы он сам выбирал
     this.progressDot__item_array = this.target_element.getElementsByClassName("slider__dot");
     // функция которая пересчитывает order, для того чтобы слайды менялись
     if (this.next_button_press) {
@@ -62,15 +61,15 @@ class Slider {
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
 
-        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
       }
 
       for (let i = 1; i < this.current; i++) {
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order; // проставляем позиции от первого и до текущего
         order++;
-        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg"; // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
       }
-      this.progressDot__item_array[this.current - 1].src = "/src/EllipseFocusBlue.svg"; //ставим точку фокуса на текущий элемент
+      this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
     } else {
       if (this.current == 1) this.current = this.num_items; // условие для того чтобы с первого элемента перейти на четвертый
       else this.current--;
@@ -81,16 +80,16 @@ class Slider {
         // аналогично предыдущим проставлениям ставим позиции для флекс элементов
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
-        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg";
+        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
       }
 
       for (let i = this.num_items; i > this.current; i--) {
         // аналогично предыдущим проставлениям ставим позиции для флекс элементов
         this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
         order++;
-        this.progressDot__item_array[i - 1].src = "/src/EllipseNofocusBlue.svg";
+        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
       }
-      this.progressDot__item_array[this.current - 1].src = "/src/EllipseFocusBlue.svg";
+      this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
     }
     this.target_element.querySelector(".slider__container").style.transform = "translateX(0)"; // после пересчета показываем первый элемент флекс конейнера
     this.target_element.querySelector(".slider__container").classList.remove("slider__container-transition"); // убираем анимации чтоб все не прыгало
