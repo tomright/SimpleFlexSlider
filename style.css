@@ -10,10 +10,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-}
-
-/* CSS transition applied when translation of items happen */
-.slider__container-transition {
   transition: transform 0.7s ease-in-out;
 }
 
