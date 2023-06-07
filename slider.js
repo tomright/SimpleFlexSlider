@@ -2,11 +2,13 @@ let all_containers = document.querySelectorAll(".slider");
 class Slider {
   current = 1; // начальный счетчик для элементов
   target_element; // поле для хранения начальной точки слайдера
-  next_button_press; // необходимо для отслеживания на какую кнопку нажал пользователь
+  num_items;
   progressDot; // нода дом дерева с прогрессом просмотра
   progressDot__item_focus; // код для добавления точки с фокусом
   progressDot__item; // код для добавления точки без фокусa
   progressDot__item_array;
+  xCoordinat = 0; // текущее смещение флекс контейнера со слайдерами
+  setToMove = 100; // шаг на который будет смещаться флекс контейнер со слайдерами
   constructor(target_element) {
     this.target_element = target_element; // заполняем начальный элемент слайдера
     this.num_items = this.target_element.querySelectorAll(".slider__item").length; //общее количество слайдов
@@ -41,70 +43,57 @@ class Slider {
     this.target_element.querySelector(".slider__prev-button").addEventListener("click", () => {
       this.gotoPrev();
     });
-    // событие которое смотрит за анимацией, когда она заканчивается, запускает функцию пересчета order для флекс элементов
-    this.target_element.querySelector(".slider__container").addEventListener("transitionend", () => {
-      this.changeOrder();
-    });
-  }
-  changeOrder() {
-    this.progressDot__item_array = this.target_element.getElementsByClassName("slider__dot");
-    // функция которая пересчитывает order, для того чтобы слайды менялись
-    if (this.next_button_press) {
-      //логика для пересчета позиций флекс элемента. true - нажата клавиша следующего слайда, иначе предыдущего
-      if (this.current == this.num_items) this.current = 1; // условие для цикличной перемотки слайдов, без остановок
-      else this.current++;
-
-      let order = 1;
-
-      for (let i = this.current; i <= this.num_items; i++) {
-        // проставляем позиции от текущего и до последнего
-        this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
-        order++;
-
-        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
-      }
-
-      for (let i = 1; i < this.current; i++) {
-        this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order; // проставляем позиции от первого и до текущего
-        order++;
-        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
-      }
-      this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
-    } else {
-      if (this.current == 1) this.current = this.num_items; // условие для того чтобы с первого элемента перейти на четвертый
-      else this.current--;
-
-      let order = 1;
-
-      for (let i = this.current; i > 0; i--) {
-        // аналогично предыдущим проставлениям ставим позиции для флекс элементов
-        this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
-        order++;
-        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
-      }
-
-      for (let i = this.num_items; i > this.current; i--) {
-        // аналогично предыдущим проставлениям ставим позиции для флекс элементов
-        this.target_element.querySelector(".slider__item[data-position='" + i + "']").style.order = order;
-        order++;
-        this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
-      }
-      this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
-    }
-    this.target_element.querySelector(".slider__container").style.transform = "translateX(0)"; // после пересчета показываем первый элемент флекс конейнера
-    this.target_element.querySelector(".slider__container").classList.remove("slider__container-transition"); // убираем анимации чтоб все не прыгало
   }
   gotoNext() {
+    this.progressDot__item_array = this.target_element.getElementsByClassName("slider__dot");
+    if (this.current == this.num_items) {
+      this.current = 1; // условие для цикличной перемотки слайдов, без остановок
+      this.xCoordinat = 0;
+    } else {
+      this.current++;
+      this.xCoordinat -= this.setToMove;
+    }
+    let order = 1;
+
+    for (let i = this.current; i <= this.num_items; i++) {
+      this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+    }
+
+    for (let i = 1; i < this.current; i++) {
+      this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true)); // проставляем не фокусные точки для того чтобы ушли фокусные точки.
+    }
+    this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
     // кнопка для перехода к следующему слайду
-    this.next_button_press = true; // чтобы отличать какая кнопка была нажата
     this.target_element.querySelector(".slider__container").classList.add("slider__container-transition"); // добавляем класс для анимации сдвига
-    this.target_element.querySelector(".slider__container").style.transform = "translateX(-100%)"; // двигаем флекс контейнер
+    console.log(this.xCoordinat);
+    this.target_element.querySelector(".slider__container").style.transform = `translateX(${this.xCoordinat}%)`; // двигаем флекс контейнер
   }
   gotoPrev() {
     // кнопка для перехода к предыдущему слайду
-    this.next_button_press = false;
+    this.progressDot__item_array = this.target_element.getElementsByClassName("slider__dot");
+
+    if (this.current == 1) {
+      // условие для того чтобы с первого элемента перейти на четвертый
+      this.current = this.num_items;
+      this.xCoordinat = -this.setToMove * this.num_items + this.setToMove;
+    } else {
+      this.current--;
+      this.xCoordinat += this.setToMove;
+    }
+
+    let order = 1;
+
+    for (let i = this.current; i > 0; i--) {
+      this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
+    }
+
+    for (let i = this.num_items; i > this.current; i--) {
+      this.progressDot__item_array[i - 1].replaceWith(this.progressDot__item.cloneNode(true));
+    }
+    this.progressDot__item_array[this.current - 1].replaceWith(this.progressDot__item_focus.cloneNode(true)); //ставим точку фокуса на текущий элемент
+    console.log(this.xCoordinat);
     this.target_element.querySelector(".slider__container").classList.add("slider__container-transition");
-    this.target_element.querySelector(".slider__container").style.transform = "translateX(100%)";
+    this.target_element.querySelector(".slider__container").style.transform = `translateX(${this.xCoordinat}%)`;
   }
 }
 
